@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DifferentiAI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      color: #263238;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #315c9b, #5278bd);
+      color: white;
+      padding: 42px 24px 48px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0 0 10px;
+      font-size: 38px;
+      letter-spacing: -1px;
+    }
+
+    .header p {
+      margin: 0 auto;
+      max-width: 650px;
+      font-size: 17px;
+      line-height: 1.6;
+      opacity: 0.95;
+    }
+
+    .container {
+      width: min(1000px, calc(100% - 32px));
+      margin: -25px auto 50px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 28px;
+      margin-bottom: 22px;
+      box-shadow: 0 8px 30px rgba(30, 50, 80, 0.08);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 22px;
+    }
+
+    .subtext {
+      color: #697586;
+      margin-top: -8px;
+      margin-bottom: 22px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      border: 2px solid #dce3ef;
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.2s;
+    }
+
+    .tab:hover {
+      border-color: #5278bd;
+    }
+
+    .tab.active {
+      border-color: #5278bd;
+      background: #f1f5fd;
+    }
+
+    .tab strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 5px;
+    }
+
+    .tab span {
+      color: #6c7888;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin: 18px 0 8px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #d8dee8;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font: inherit;
+      background: white;
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 3px solid #dce7fa;
+      border-color: #5278bd;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .diff-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .diff-option {
+      border: 2px solid #dce3ef;
+      border-radius: 14px;
+      padding: 17px;
+      cursor: pointer;
+      text-align: center;
+      background: white;
+    }
+
+    .diff-option input {
+      width: auto;
+      margin-right: 7px;
+    }
+
+    .diff-option:hover {
+      border-color: #5278bd;
+    }
+
+    .language-options {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .language-option {
+      padding: 13px 15px;
+      border: 1px solid #dce3ef;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .language-option input {
+      width: auto;
+      margin-right: 8px;
+    }
+
+    .upload {
+      border: 2px dashed #b9c6da;
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      margin-top: 12px;
+      background: #fafbfe;
+    }
+
+    .upload-icon {
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+
+    .upload input {
+      border: none;
+      padding: 10px;
+      max-width: 400px;
+    }
+
+    .button {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      background: #315c9b;
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 24px;
+    }
+
+    .button:hover {
+      background: #274d86;
+    }
+
+    .button.secondary {
+      background: #eef2f8;
+      color: #315c9b;
+      margin-top: 10px;
+    }
+
+    .preview {
+      display: none;
+    }
+
+    .preview.show {
+      display: block;
+    }
+
+    .worksheet-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .worksheet {
+      border: 1px solid #dce3ef;
+      border-radius: 14px;
+      padding: 18px;
+      min-height: 250px;
+    }
+
+    .worksheet h3 {
+      margin-top: 0;
+    }
+
+    .worksheet.scaffold {
+      background: #f8fbff;
+    }
+
+    .worksheet.core {
+      background: #fffdf7;
+    }
+
+    .worksheet.extend {
+      background: #faf8ff;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #edf1f7;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .note {
+      background: #f5f7fb;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 15px;
+      color: #667085;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .edit-box {
+      margin-top: 18px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #8993a3;
+      font-size: 13px;
+      padding: 10px 20px 35px;
+    }
+
+    @media (max-width: 700px) {
+      .grid,
+      .tabs,
+      .worksheet-grid,
+      .diff-options {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 30px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <h1>DifferentiAI</h1>
+    <p>
+      Turn one learning goal into meaningful learning pathways
+      for every learner.
+    </p>
+  </header>
+
+  <main class="container">
+
+    <section class="card">
+      <h2>What would you like to do?</h2>
+      <p class="subtext">
+        Start with an idea or adapt a resource you already have.
+      </p>
+
+      <div class="tabs">
+        <button class="tab active" id="createTab" type="button">
+          <strong>✨ Create a new worksheet</strong>
+          <span>Describe your lesson, learning objective and what you want students to do.</span>
+        </button>
+
+        <button class="tab" id="uploadTab" type="button">
+          <strong>📄 Differentiate an existing worksheet</strong>
+          <span>Upload a resource you already use and create differentiated versions.</span>
+        </button>
+      </div>
+
+      <div id="createArea">
+
+        <div class="grid">
+          <div>
+            <label for="subject">Subject</label>
+            <select id="subject">
+              <option>English</option>
+              <option>UOI</option>
+              <option>Maths</option>
+              <option>Science</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="grade">Grade</label>
+            <select id="grade">
+              <option>Grade 1</option>
+              <option>Grade 2</option>
+              <option selected>Grade 3</option>
+              <option>Grade 4</option>
+              <option>Grade 5</option>
+              <option>Grade 6</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="objective">Learning objective</label>
+        <textarea id="objective"
+          placeholder="What should students understand, know or be able to do?"></textarea>
+
+        <label for="description">What would you like the worksheet to include?</label>
+        <textarea id="description"
+          placeholder="Describe the activity you have in mind. For example: I want students to identify community services, match them to their purpose, and explain how they help people. Make it fun and visually engaging."></textarea>
+
+      </div>
+
+      <div id="uploadArea" style="display:none;">
+
+        <label>Upload your existing resource</label>
+
+        <div class="upload">
+          <div class="upload-icon">📄</div>
+          <strong>Choose a worksheet or document</strong>
+          <p class="subtext">
+            PDF, Word document, PowerPoint or image
+          </p>
+          <input type="file" id="fileUpload"
+            accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg">
+        </div>
+
+        <label for="existingLevel">What version is this?</label>
+        <select id="existingLevel">
+          <option value="core">🎯 Core</option>
+          <option value="scaffold">🌱 Scaffold</option>
+          <option value="extend">🚀 Extend</option>
+          <option value="analyse">🤷 I'm not sure — analyse it</option>
+        </select>
+
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>Choose your differentiation</h2>
+      <p class="subtext">
+        The learning objective should remain meaningful across all versions.
+      </p>
+
+      <div class="diff-options">
+
+        <label class="diff-option">
+          <input type="checkbox" id="scaffold" checked>
+          🌱 <strong>Scaffold</strong>
+        </label>
+
+        <label class="diff-option">
+          <input type="checkbox" id="core" checked>
+          🎯 <strong>Core</strong>
+        </label>
+
+        <label class="diff-option">
+          <input type="checkbox" id="extend" checked>
+          🚀 <strong>Extend</strong>
+        </label>
+
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>Language support</h2>
+      <p class="subtext">
+        Add language scaffolds without changing the learning objective.
+      </p>
+
+      <div class="language-options">
+
+        <label class="language-option">
+          <input type="radio" name="language" value="none" checked>
+          English only
+        </label>
+
+        <label class="language-option">
+          <input type="radio" name="language" value="vocab">
+          English + Chinese key vocabulary
+        </label>
+
+        <label class="language-option">
+          <input type="radio" name="language" value="instructions">
+          English + Chinese instructions only
+        </label>
+
+        <label class="language-option">
+          <input type="radio" name="language" value="both">
+          English + Chinese instructions and key vocabulary
+        </label>
+
+      </div>
+
+      <button class="button" id="generateButton" type="button">
+        ✨ Generate differentiated worksheets
+      </button>
+
+    </section>
+
+
+    <section class="card preview" id="preview">
+
+      <h2>Your differentiated resources</h2>
+
+      <p class="subtext">
+        This is a prototype preview. AI generation will be connected in the next stage.
+      </p>
+
+      <div class="worksheet-grid">
+
+        <div class="worksheet scaffold">
+          <span class="badge">🌱 SCAFFOLD</span>
+          <h3>Your supported version</h3>
+          <p>More language support, modelling, vocabulary and smaller steps.</p>
+
+          <div class="note">
+            Example AI features:<br>
+            • vocabulary support<br>
+            • sentence frames<br>
+            • visual prompts<br>
+            • Chinese support when selected
+          </div>
+        </div>
+
+        <div class="worksheet core">
+          <span class="badge">🎯 CORE</span>
+          <h3>Your core version</h3>
+          <p>The intended Grade-level learning experience.</p>
+
+          <div class="note">
+            Example AI features:<br>
+            • appropriate Grade-level language<br>
+            • independent tasks<br>
+            • meaningful questions
+          </div>
+        </div>
+
+        <div class="worksheet extend">
+          <span class="badge">🚀 EXTEND</span>
+          <h3>Your extended version</h3>
+          <p>Greater independence, depth and challenge.</p>
+
+          <div class="note">
+            Example AI features:<br>
+            • deeper thinking<br>
+            • evidence and justification<br>
+            • application and transfer
+          </div>
+        </div>
+
+      </div>
+
+      <div class="edit-box">
+
+        <label for="feedback">
+          ✏️ What would you like to change?
+        </label>
+
+        <textarea id="feedback"
+          placeholder="For example: I like this worksheet, but there is too much Chinese. Keep Chinese only in the instructions and keep all questions in English."></textarea>
+
+        <button class="button secondary" type="button" id="editButton">
+          ✏️ Edit this worksheet
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <div class="footer">
+    DifferentiAI • AI-supported differentiation for teachers
+  </div>
+
+
+  <script>
+
+    const createTab = document.getElementById("createTab");
+    const uploadTab = document.getElementById("uploadTab");
+    const createArea = document.getElementById("createArea");
+    const uploadArea = document.getElementById("uploadArea");
+    const generateButton = document.getElementById("generateButton");
+    const preview = document.getElementById("preview");
+
+    createTab.addEventListener("click", () => {
+      createTab.classList.add("active");
+      uploadTab.classList.remove("active");
+      createArea.style.display = "block";
+      uploadArea.style.display = "none";
+    });
+
+    uploadTab.addEventListener("click", () => {
+      uploadTab.classList.add("active");
+      createTab.classList.remove("active");
+      createArea.style.display = "none";
+      uploadArea.style.display = "block";
+    });
+
+    generateButton.addEventListener("click", () => {
+      preview.classList.add("show");
+      preview.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+
+    document.getElementById("editButton").addEventListener("click", () => {
+      const feedback = document.getElementById("feedback").value.trim();
+
+      if (!feedback) {
+        alert("Tell the AI what you would like to change first.");
+        return;
+      }
+
+      alert(
+        "Great! In the next version, this feedback will be sent to the AI so it can edit the existing worksheet without starting again."
+      );
+    });
+
+  </script>
+
+</body>
+</html>
