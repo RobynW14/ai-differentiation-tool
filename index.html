@@ -568,13 +568,64 @@
       uploadArea.style.display = "block";
     });
 
-    generateButton.addEventListener("click", () => {
-      preview.classList.add("show");
-      preview.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    });
+generateButton.addEventListener("click", () => {
+  preview.innerHTML = `
+    <div class="card">
+      <h2>🌱 Scaffold Version</h2>
+      <p><strong>More support for learners who need it</strong></p>
+      <ul>
+        <li>Key vocabulary support</li>
+        <li>Smaller, manageable steps</li>
+        <li>Sentence starters and examples</li>
+        <li>Visual prompts</li>
+        <li>Chinese instructions if selected</li>
+      </ul>
+      <p><strong>Example worksheet activity:</strong></p>
+      <p>Complete the activity using the vocabulary bank and sentence starters provided.</p>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Core Version</h2>
+      <p><strong>Grade-level learning</strong></p>
+      <ul>
+        <li>Age-appropriate vocabulary</li>
+        <li>Independent tasks</li>
+        <li>Meaningful questions</li>
+        <li>Less scaffolding</li>
+      </ul>
+      <p><strong>Example worksheet activity:</strong></p>
+      <p>Complete the task independently and explain your thinking.</p>
+    </div>
+
+    <div class="card">
+      <h2>🚀 Extend Version</h2>
+      <p><strong>Greater challenge and independence</strong></p>
+      <ul>
+        <li>Deeper thinking</li>
+        <li>More independent application</li>
+        <li>Evidence and justification</li>
+        <li>Challenge questions</li>
+      </ul>
+      <p><strong>Example worksheet activity:</strong></p>
+      <p>Apply your learning to a new situation and explain or justify your answer.</p>
+    </div>
+
+    <div class="card">
+      <h2>✏️ Want to change something?</h2>
+      <p>Tell the AI what you would like changed in the feedback box above.</p>
+      <button onclick="document.getElementById('feedback').focus()">
+        Edit this worksheet
+      </button>
+    </div>
+  `;
+
+  preview.classList.add("show");
+
+  preview.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+});
 
     document.getElementById("editButton").addEventListener("click", () => {
       const feedback = document.getElementById("feedback").value.trim();
